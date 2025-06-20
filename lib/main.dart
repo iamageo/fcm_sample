@@ -1,9 +1,56 @@
-import 'package:fcm_sample/sample_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-
+import 'package:fcm_sample/sample_screen.dart';
 import 'firebase_options.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  final notif = message.notification;
+  debugPrint('📥 [FCM][Background]');
+  debugPrint('   • Título: ${notif?.title ?? '—'}');
+  debugPrint('   • Corpo:  ${notif?.body  ?? '—'}');
+  debugPrint('   • Dados:  ${message.data}');
+}
+
+Future<void> configureFirebaseMessaging() async {
+  final messaging = FirebaseMessaging.instance;
+
+  final settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  debugPrint('🛡️ [FCM] Permissões: ${settings.authorizationStatus}');
+
+  final token = await messaging.getToken();
+  if (token != null) {
+    debugPrint('🔑 [FCM] Token obtido:\n$token');
+  } else {
+    debugPrint('⚠️ [FCM] Falha ao obter token');
+  }
+
+  FirebaseMessaging.onMessage.listen((msg) {
+    final notif = msg.notification;
+    debugPrint('📲 [FCM][Foreground]');
+    debugPrint('   • Título: ${notif?.title ?? '—'}');
+    debugPrint('   • Corpo:  ${notif?.body  ?? '—'}');
+    debugPrint('   • Dados:  ${msg.data}');
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((msg) {
+    final notif = msg.notification;
+    debugPrint('👆 [FCM][OpenedApp]');
+    debugPrint('   • Título: ${notif?.title ?? '—'}');
+    debugPrint('   • Corpo:  ${notif?.body  ?? '—'}');
+    debugPrint('   • Dados:  ${msg.data}');
+  });
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+}
 
 void main() async {
 
@@ -24,58 +71,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'FCM Sample',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SampleScreen(),
+      home: const SampleScreen(),
     );
   }
-}
-
-Future<void> configureFirebaseMessaging() async {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-
-  print('User granted permission: ${settings.authorizationStatus}');
-
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Message data: ${message.data}');
-
-    if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-    }
-  }).onData((data) {
-    print('data from stream: ${data.data}');
-  });
-
-  FirebaseMessaging.onMessageOpenedApp.listen((message) async {
-    print('NOTIFICATION MESSAGE TAPPED');
-    print('Message data: ${message.data}');
-
-    if (message.notification != null) {
-      print(
-          'Message also contained a notification, with the following:\nTitle: ${message.notification?.title}\nBody: ${message.notification?.body}');
-    }
-
-    return;
-  }).onData((data) {
-    print('data from stream: ${data.data}');
-  });
-
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-}
-
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.data.entries}");
 }

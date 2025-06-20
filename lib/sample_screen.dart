@@ -17,7 +17,7 @@ class _SampleScreenState extends State<SampleScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Made with ❤️ by iamageo"),
+          Center(child: Text("Made with ❤️ by iamageo")),
         ],
       ),
     );

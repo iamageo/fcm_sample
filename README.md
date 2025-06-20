@@ -1,16 +1,28 @@
-# fcm_sample
+# FCM Sample Flutter App
 
-A new Flutter project.
+Um exemplo completo de integração Flutter com Firebase Cloud Messaging (FCM), mostrando como:
 
-## Getting Started
+- Solicitar permissões de notificação
+- Capturar o token de dispositivo
+- Tratar notificações em **foreground**, **background** e **ao abrir**
+- Configurar um handler de background
+- Exibir logs amigáveis e com emojis para facilitar o debug
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Funcionalidades
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **`configureFirebaseMessaging()`**: inicializa o FCM, pede permissões e loga o token
+- **`onMessage`**: capta notificações em primeiro plano
+- **`onMessageOpenedApp`**: detecta quando o usuário toca na notificação
+- **Background handler**: registra notificações mesmo com o app em background ou fechado
+- **Logs formatados** com emojis para rápida identificação
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 📋 Pré-requisitos
+
+- Flutter 3.x ou superior
+- Conta Firebase e projeto configurado
+- FlutterFire CLI instalado e Firebase inicializado (`flutterfire configure`)
+- Adicione o arquivo de configuração gerado (`firebase_options.dart`)
